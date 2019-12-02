@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SFTP_Proxy_Service.Gateway;
 using SFTP_Proxy_Service.Options;
 using SFTP_Proxy_Service.Services;
 
@@ -21,7 +22,9 @@ namespace SFTP_Proxy_Service
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<SFTPOptions>(Configuration.GetSection(nameof(SFTPOptions)));
-            services.AddScoped<SftpSenderService>();
+            services.AddScoped<ISFTPSenderService, SftpSenderService>();
+            services.AddScoped<ISFTPGateway, SFTPGateway>();
+            services.AddScoped<ISFTPClient, SFTPClient>();
             services.AddControllers();
         }
 

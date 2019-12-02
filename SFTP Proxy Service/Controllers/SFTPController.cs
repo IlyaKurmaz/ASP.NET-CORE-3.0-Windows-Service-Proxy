@@ -10,8 +10,8 @@ namespace SFTP_Proxy_Service.Controllers
     [Route("[controller]")]
     public class SFTPController : ControllerBase
     {
-        private readonly SftpSenderService sftpSenderService;
-        public SFTPController(SftpSenderService sftpSenderService)
+        private readonly ISFTPSenderService sftpSenderService;
+        public SFTPController(ISFTPSenderService sftpSenderService)
         {
             this.sftpSenderService = sftpSenderService;
         }

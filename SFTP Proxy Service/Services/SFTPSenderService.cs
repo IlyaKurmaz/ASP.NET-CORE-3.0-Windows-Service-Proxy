@@ -3,36 +3,31 @@ using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Serilog;
 using SFTP_Proxy_Service.Enums;
+using SFTP_Proxy_Service.Gateway;
 using SFTP_Proxy_Service.Options;
 using System;
 using System.Collections.Generic;
 
 namespace SFTP_Proxy_Service.Services
 {
-    public class SftpSenderService
+    public class SftpSenderService : ISFTPSenderService
     {
-        private readonly string _host;
-        private readonly string _username;
-        private readonly string _password;
-        private readonly int _port;
-        public SftpSenderService(IOptions<SFTPOptions> options)
+        private readonly ISFTPGateway _gateway;
+
+        private readonly IOptions<SFTPOptions> _options;
+        public SftpSenderService(ISFTPGateway gateway, IOptions<SFTPOptions> options)
         {
-            _host = options.Value.Host;
-            _username = options.Value.UserName;
-            _password = options.Value.Password;
-            _port = options.Value.Port;
+            _gateway = gateway;
+            _options = options;
         }
 
         public UploadStatus Send(IEnumerable<IFormFile> files)
         {
-            var connectionInfo = new Renci.SshNet.ConnectionInfo(host: _host, port: _port, username: _username, new PasswordAuthenticationMethod(_username, _password));
-
-            using (var sftp = new SftpClient(connectionInfo))
+            using (var client = _gateway.GetSFTPClient(_options))
             {
-
                 try
                 {
-                    sftp.Connect();
+                    client.Connect();
                 }
                 catch (Exception ex)
                 {
@@ -45,7 +40,7 @@ namespace SFTP_Proxy_Service.Services
                 {
                     try
                     {
-                        sftp.UploadFile(file.OpenReadStream(), file.FileName, true);
+                        client.UploadFile(file);
                     }
                     catch (Exception ex)
                     {
@@ -56,10 +51,9 @@ namespace SFTP_Proxy_Service.Services
                     Log.Information($"File {file.Name} was uploaded successfully");
                 }
 
-                sftp.Disconnect();
+                client.Disconnect();
             }
 
-           
             return UploadStatus.UploadSuccessful;
         }
 
