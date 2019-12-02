@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using SFTP_Proxy_Service.Enums;
 using SFTP_Proxy_Service.Services;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace SFTP_Proxy_Service.Controllers
 {
@@ -23,9 +27,9 @@ namespace SFTP_Proxy_Service.Controllers
         [HttpPost]
         public UploadStatus Post()
         {
-            var file = Request.Form.Files[0];
+            IEnumerable<IFormFile> files = Request.Form.Files;
 
-            return sftpSenderService.Send(file);
+            return sftpSenderService.Send(files);
         }
     }
 }

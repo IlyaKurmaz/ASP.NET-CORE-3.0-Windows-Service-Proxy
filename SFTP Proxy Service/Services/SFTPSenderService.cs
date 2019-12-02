@@ -5,6 +5,7 @@ using Serilog;
 using SFTP_Proxy_Service.Enums;
 using SFTP_Proxy_Service.Options;
 using System;
+using System.Collections.Generic;
 
 namespace SFTP_Proxy_Service.Services
 {
@@ -22,7 +23,7 @@ namespace SFTP_Proxy_Service.Services
             _port = options.Value.Port;
         }
 
-        public UploadStatus Send(IFormFile file)
+        public UploadStatus Send(IEnumerable<IFormFile> files)
         {
             var connectionInfo = new Renci.SshNet.ConnectionInfo(host: _host, port: _port, username: _username, new PasswordAuthenticationMethod(_username, _password));
 
@@ -42,20 +43,25 @@ namespace SFTP_Proxy_Service.Services
 
                 //sftp.ChangeDirectory("/DestinyFolder w/e");
 
-                try
+                foreach(var file in files)
                 {
-                    sftp.UploadFile(file.OpenReadStream(), file.FileName, true);
-                }
-                catch (Exception ex)
-                {
-                    Log.Fatal(ex, $"Upload failed for file {file.FileName}");
-                    return UploadStatus.UploadFailed;
+                    try
+                    {
+                        sftp.UploadFile(file.OpenReadStream(), file.FileName, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Fatal(ex, $"Upload failed for file {file.FileName}");
+                        return UploadStatus.UploadFailed;
+                    }
+
+                    Log.Information($"File {file.Name} was uploaded successfully");
                 }
 
                 sftp.Disconnect();
             }
 
-            Log.Information($"File {file.Name} was uploaded successfully");
+           
             return UploadStatus.UploadSuccessful;
         }
 
