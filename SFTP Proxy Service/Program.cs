@@ -28,7 +28,7 @@ namespace SFTP_Proxy_Service
                   services.Configure<EventLogSettings>(config =>
                   {
                       config.LogName = "SFTP Proxy API";
-                      config.SourceName = "SFTP Proxy API;
+                      config.SourceName = "SFTP Proxy API";
                   });
               })
               .ConfigureWebHostDefaults(webBuilder =>
