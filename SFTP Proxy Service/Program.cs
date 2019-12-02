@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.EventLog;
+using Serilog;
+using Serilog.Events;
 
 namespace SFTP_Proxy_Service
 {
@@ -11,14 +11,34 @@ namespace SFTP_Proxy_Service
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+              .MinimumLevel.Debug()
+              .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+              .Enrich.FromLogContext()
+              .WriteTo.File(@"C:\temp\sftp\LogFile.txt")
+              .CreateLogger();
+
             CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddHostedService<Worker>();
-                });
+           Host.CreateDefaultBuilder(args)
+              .ConfigureServices(services =>
+              {
+                  services.Configure<EventLogSettings>(config =>
+                  {
+                      config.LogName = "SFTP Proxy API";
+                      config.SourceName = "SFTP Proxy API;
+                  });
+              })
+              .ConfigureWebHostDefaults(webBuilder =>
+              {
+                  webBuilder.UseStartup<Startup>();
+              })
+              .ConfigureWebHost(config =>
+              {
+                  config.UseUrls("http://*:5050");
+              })
+              .UseWindowsService();
     }
 }

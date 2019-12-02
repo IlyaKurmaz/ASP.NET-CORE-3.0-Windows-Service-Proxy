@@ -24,7 +24,7 @@ namespace SFTP_Proxy_Service.Services
 
         public UploadStatus Send(IFormFile file)
         {
-            var connectionInfo = new ConnectionInfo(host: _host, port: _port, username: _username, new PasswordAuthenticationMethod(_username, _password));
+            var connectionInfo = new Renci.SshNet.ConnectionInfo(host: _host, port: _port, username: _username, new PasswordAuthenticationMethod(_username, _password));
 
             using (var sftp = new SftpClient(connectionInfo))
             {
