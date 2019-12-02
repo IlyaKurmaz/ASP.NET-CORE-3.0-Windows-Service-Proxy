@@ -41,8 +41,6 @@ namespace SFTP_Proxy_Service.Services
                     return UploadStatus.ConnectionRefused;
                 }
 
-                //sftp.ChangeDirectory("/DestinyFolder w/e");
-
                 foreach(var file in files)
                 {
                     try
