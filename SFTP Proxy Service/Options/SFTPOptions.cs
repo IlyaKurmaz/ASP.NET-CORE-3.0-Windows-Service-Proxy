@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace SFTP_Proxy_Service.Options
+﻿namespace SFTP_Proxy_Service.Options
 {
     /// <summary>
     /// Binding class for SFTP configuration section.

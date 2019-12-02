@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Renci.SshNet;
 using Serilog;
 using SFTP_Proxy_Service.Enums;
 using SFTP_Proxy_Service.Gateway;
 using SFTP_Proxy_Service.Options;
 using System;
 using System.Collections.Generic;
+
+using static SFTP_Proxy_Service.Enums.UploadStatus;
 
 namespace SFTP_Proxy_Service.Services
 {
@@ -33,7 +34,7 @@ namespace SFTP_Proxy_Service.Services
                 {
                     Log.Fatal(ex, "Connection refused");
 
-                    return UploadStatus.ConnectionRefused;
+                    return ConnectionRefused;
                 }
 
                 foreach(var file in files)
@@ -45,7 +46,7 @@ namespace SFTP_Proxy_Service.Services
                     catch (Exception ex)
                     {
                         Log.Fatal(ex, $"Upload failed for file {file.FileName}");
-                        return UploadStatus.UploadFailed;
+                        return UploadFailed;
                     }
 
                     Log.Information($"File {file.Name} was uploaded successfully");
@@ -54,7 +55,7 @@ namespace SFTP_Proxy_Service.Services
                 client.Disconnect();
             }
 
-            return UploadStatus.UploadSuccessful;
+            return UploadSuccessful;
         }
 
     }
